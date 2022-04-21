@@ -1,4 +1,7 @@
 
+from asyncio import subprocess
+from posixpath import dirname
+from re import T
 from fastapi import FastAPI , UploadFile, File
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +12,7 @@ import os
 import shutil
 from pydantic import BaseModel
 from devtools import debug
+from pathlib import Path
 
 app = FastAPI()
 
@@ -28,6 +32,23 @@ async def test(file: Files):
     except: 
         lines = None
     return lines
+
+@app.get("/folder_size")
+async def folder_size():
+    
+    def get_size(folder: str) -> int:
+        return sum(p.stat().st_size for p in Path(folder).rglob('*'))
+
+    def filesize(size: int) -> str:
+        for unit in ("B", "K", "M", "G", "T"):
+            if size < 1024:
+                break
+            size /= 1024
+        return f"{size:.1f}{unit}"
+
+    path = 'files/'
+    
+    return filesize(get_size(path))
 
 @app.post("/upload-text")
 async def create_upload_text(text: Text):
@@ -69,6 +90,7 @@ async def create_upload_files(files: List[UploadFile] = File(...)):
 
 @app.get("/get_all_folder")
 async def get_all_name():
+    
     folder = os.listdir('files')
     names = [{f_name: os.listdir('files/'+f_name), 'size': os.path.getsize('files/'+f_name)} for f_name in folder]
     return names if names else None

@@ -3,5 +3,6 @@ export default function () {
     folder: undefined,
     name_file: {},
     status_upload: false,
+    folder_size: undefined,
   };
 }

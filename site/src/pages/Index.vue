@@ -25,7 +25,11 @@
           </q-card-section>
 
           <q-card-section>
-            <div v-for="n_file in Object.values(name)[0]" v-bind:key="n_file">
+            <div
+              class="row"
+              v-for="n_file in Object.values(name)[0]"
+              v-bind:key="n_file"
+            >
               {{ n_file }}
             </div>
           </q-card-section>
@@ -35,7 +39,7 @@
               <q-btn
                 style="background: green; margin-right: 10px"
                 label="open"
-                @click="(open = true), (files = name)"
+                @click="(open = true), (files = name), (read = false)"
               />
             </div>
           </q-card-action>
@@ -54,25 +58,33 @@
                     style="margin: 1px; color: #03a9f4"
                     @click="download(Object.keys(files)[0], name_f)"
                   >
-                    <!-- <li>» {{ name_f }}</li> -->
                     <div style="color: #4caf50">»</div>
                     <div style="margin-left: 10px; color: #c4c4c4">
                       <div v-if="Object.values(files)[0].length === 1">
                         {{ read_txt(files, name_f) }}
                       </div>
-                      <div v-else>
-                        {{ (get_txt = "") }}
-                      </div>
+                      <div v-else>{{ (get_txt = "") }}</div>
                       {{ name_f }}
                     </div>
                   </h6>
                   <br />
+
                   <div
-                    style="color: green"
-                    v-for="line in get_txt"
-                    v-bind:key="line"
+                    v-if="get_txt"
+                    style="color: #00bcd4"
+                    @click="read = true"
                   >
-                    {{ line }}
+                    read . . .
+                  </div>
+
+                  <div v-if="read">
+                    <div
+                      style="color: green"
+                      v-for="line in get_txt"
+                      v-bind:key="line"
+                    >
+                      {{ line }}
+                    </div>
                   </div>
                 </div>
               </q-card-section>
@@ -235,7 +247,11 @@ export default {
     var text = ref(null);
 
     var get_txt = "";
+
+    var read = ref(false);
     return {
+      read,
+
       get_txt,
 
       addText,
@@ -292,6 +308,7 @@ export default {
     delete_file(file) {
       console.log("delete: ", Object.keys(file));
       this.$store.dispatch("showcase/delete_folder", Object.keys(file));
+      this.$store.dispatch("showcase/folder_size");
       this.$store.dispatch("showcase/get_all_folder");
     },
     file_selected(file) {
@@ -330,6 +347,7 @@ export default {
                   timeout: 1000,
                   message: "send file",
                 });
+                this.$store.dispatch("showcase/folder_size");
                 this.$store.dispatch("showcase/get_all_folder");
                 this.$store.commit("showcase/STATUS_UPLOAD", {
                   status_upload: false,

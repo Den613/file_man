@@ -1,4 +1,4 @@
-#!/home/share2/f_man/api/.venv/bin/python
+#!/home/share2/f_man/file_man/api/.venv/bin/python
 
 import sys
 import getopt

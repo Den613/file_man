@@ -46,3 +46,14 @@ export function delete_folder({}, param) {
     console.log("ok");
   });
 }
+
+export function folder_size({ commit }) {
+  api
+    .get("/folder_size")
+    .then((response) => {
+      commit("FOLDER_SIZE", { folder_size: response.data });
+    })
+    .catch((error) => {
+      console.log("get size folder error!!!");
+    });
+}
